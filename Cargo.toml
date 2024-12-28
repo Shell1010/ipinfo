@@ -1,0 +1,24 @@
+[package]
+name = "ipinfo"
+version = "0.1.0"
+authors = ["Shell1010 <amin.dev03@gmail.com>"]
+edition = "2021"
+description = "A high-performance CLI for fetching IP information"
+repository = "https://github.com/shell1010/ipinfo" 
+license = "MIT"
+
+[dependencies]
+dirs = "5.0.1"
+serde = { version = "1.0.217", features = ["derive"] }
+clap = { version = "4.5.23", features = ["derive"] }
+serde_json = "1.0.134"
+reqwest = { version = "0.12.11", features = ["blocking", "json"] }
+colored = "2.2.0"
+
+[profile.release]
+opt-level = "z"         
+lto = "thin"           
+codegen-units = 1        
+panic = "abort"  
+strip = true                 
+
