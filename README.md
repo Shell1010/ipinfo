@@ -6,7 +6,7 @@ Due to the fact this is not currently on crates.io, you'll have to run the follo
 ```sh
 git clone https://github.com/Shell1010/ipinfo.git
 cd ipinfo
-cargo install --path
+cargo install --path .
 ```
 
 
