@@ -5,6 +5,9 @@ use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fs;
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -20,6 +23,9 @@ struct Args {
     #[arg(short = 'c', long = "cookie", help = "Set or update the cookie.")]
     cookie: Option<String>,
 
+    #[arg(short = 'f', long = "file", help = "Read addresses from a file.")]
+    file: Option<String>,
+
     #[arg(short, long, help = "Enable verbose output.")]
     verbose: bool,
 }
@@ -27,6 +33,20 @@ struct Args {
 #[derive(Serialize, Deserialize, Debug)]
 struct Config {
     cookie: String,
+}
+
+fn read_lines_to_vec(file_path: &str) -> io::Result<Vec<String>> {
+    let path = Path::new(file_path);
+    let file = File::open(path)?;
+    let reader = io::BufReader::new(file);
+
+    let mut lines = Vec::new();
+    for line in reader.lines() {
+        let line = line?; 
+        lines.push(line);
+    }
+
+    Ok(lines)
 }
 
 impl Config {
@@ -154,7 +174,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{}", "IP Information Fetcher".bold().blue());
     println!("{}", "-----------------------".bold().blue());
 
-    let args = Args::parse();
+    let mut args = Args::parse();
 
     if let Some(cookie_value) = args.cookie {
         let config = Config {
@@ -166,12 +186,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let config = Config::load()?;
-    if args.ip_addresses.is_empty() {
-        eprintln!("{}", "No IP addresses provided. Use: ipinfo <IP> [<IP>...]".bold().red());
-        return Ok(());
+    let mut addresses = vec![];
+    addresses.append(&mut args.ip_addresses);
+    if let Some(file) = args.file {
+        addresses.append(&mut read_lines_to_vec(&file)?);
     }
+    if addresses.is_empty() {
+        eprintln!(
+            "{}",
+            "No IP addresses provided. Use: ipinfo <IP> [<IP>...]"
+                .bold()
+                .red()
+        );
+        return Ok(());
+    } 
 
-    for ip in args.ip_addresses {
+    for ip in addresses {
         if fetch_ip_info(&ip, &config.cookie, args.verbose).is_ok() {};
     }
 
