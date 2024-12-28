@@ -2,6 +2,9 @@
 Ipinfo is a program that will display information regarding an IP address, it'll use https://ipinfo.io to make the requests. It makes authenticated requests on your behalf, however it does not use an access token and therefore it is possible to simulate certain premium features for free.
 
 ## Installation
+**Requires [Rust](https://www.rust-lang.org/learn/get-started) installed**
+
+
 Due to the fact this is not currently on crates.io, you'll have to run the following commands to install it to your system.
 ```sh
 git clone https://github.com/Shell1010/ipinfo.git
