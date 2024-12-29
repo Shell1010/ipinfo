@@ -77,6 +77,15 @@ fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     Ok(path)
 }
 
+fn prettify_item(item: &Value, indent: usize) {
+    let indent_str = "  ".repeat(indent);
+    println!(
+        "{}{}",
+        indent_str,
+        item.to_string().green()
+    );
+}
+
 fn prettify_json(key: &str, value: &Value, indent: usize) {
     let indent_str = "  ".repeat(indent);
 
@@ -94,7 +103,7 @@ fn prettify_json(key: &str, value: &Value, indent: usize) {
         Value::Array(array) => {
             println!("{}{}: [", indent_str, key.bold().blue());
             for item in array {
-                prettify_json("", item, indent + 1);
+                prettify_item(item, indent + 1);
             }
             println!("{}]", indent_str);
         }
@@ -171,9 +180,6 @@ fn fetch_ip_info(ip: &str, cookie: &str, verbose: bool) -> Result<(), Box<dyn st
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("{}", "IP Information Fetcher".bold().blue());
-    println!("{}", "-----------------------".bold().blue());
-
     let mut args = Args::parse();
 
     if let Some(cookie_value) = args.cookie {
